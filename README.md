@@ -5,43 +5,37 @@ A Codex skill that migrates all Claude skills from `~/.claude/skills` to `~/.cod
 ## Features
 
 - Backup existing Codex skills before migration
-- Full sync with `rsync` (including scripts/assets/symlinks)
+- Full sync with `rsync` (including scripts, assets, symlinks)
 - Rewrite hardcoded path references from Claude to Codex
 - Read-only verification mode
 
-## Project Structure
+## Files
 
-- `SKILL.md`: skill trigger metadata and workflow instructions
+- `SKILL.md`: skill metadata and workflow guidance
 - `scripts/migrate.sh`: full migration script
 - `scripts/check.sh`: read-only validation script
 
 ## Usage
 
-### 1. Install into Codex skills directory
-
 ```bash
-mkdir -p ~/.codex/skills/claude-skills-migrator
-cp -R ./* ~/.codex/skills/claude-skills-migrator/
-chmod +x ~/.codex/skills/claude-skills-migrator/scripts/*.sh
-```
-
-### 2. Run migration
-
-```bash
+# Run migration
 bash ~/.codex/skills/claude-skills-migrator/scripts/migrate.sh
-```
 
-### 3. Run read-only check
-
-```bash
+# Validation only
 bash ~/.codex/skills/claude-skills-migrator/scripts/check.sh
 ```
 
-## Notes
+## Safety
 
-- `migrate.sh` uses `rsync -a --delete`; target directory will mirror source.
-- In restricted environments, run scripts directly in your local terminal.
+- `migrate.sh` uses `rsync -a --delete`; destination mirrors source.
+- The script creates a timestamped backup of `~/.codex/skills` before sync.
 
-## License
+## Example Output
 
-MIT (or your preferred license)
+```text
+[1/4] Backup created: /Users/<you>/.codex/skills.backup.YYYYMMDD-HHMMSS
+[2/4] Full sync completed
+[3/4] Path rewrite completed
+[4/4] Verify: source dirs=29, target dirs=29
+[OK] Migration finished.
+```
