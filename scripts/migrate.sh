@@ -51,7 +51,11 @@ sync_dir_if_exists() {
   local dst="$2"
   if [[ -d "$src" ]]; then
     mkdir -p "$dst"
-    rsync -a --delete --exclude ".DS_Store" "$src/" "$dst/"
+    if [[ "$dst" == "$DST_SKILLS" ]]; then
+      rsync -a --delete --exclude ".DS_Store" --exclude "skillshift" --exclude ".system" "$src/" "$dst/"
+    else
+      rsync -a --delete --exclude ".DS_Store" "$src/" "$dst/"
+    fi
     echo "  - synced: $src -> $dst"
   else
     echo "  - skipped (not found): $src"
@@ -148,4 +152,3 @@ echo "  - skills dirs: source=$SRC_SKILL_DIRS target=$DST_SKILL_DIRS"
 echo "  - slash commands(md): source=$SRC_CMD_FILES target_prompts=$DST_CMD_FILES"
 
 echo "[OK] Migration finished."
-
