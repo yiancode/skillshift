@@ -5,7 +5,7 @@ description: Migrate Claude assets to Codex, including skills, slash commands, p
 
 # SkillShift
 
-Use this skill when the user asks to migrate/convert/sync Claude skills into Codex skills.
+Use this skill when the user asks to migrate/convert/sync Claude setup into Codex.
 
 ## What This Skill Does
 
@@ -50,7 +50,7 @@ After running, report:
 3. plugins/mcp/subagents/hooks/templates migration status.
 4. Path rewrite completion status.
 5. Verify lines for key modules.
-5. Whether migration is successful.
+6. Whether migration is successful.
 
 ## Notes
 
