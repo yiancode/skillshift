@@ -1,5 +1,7 @@
 # SkillShift
 
+[中文说明](README.zh-CN.md)
+
 A Codex skill that migrates all Claude skills from `~/.claude/skills` to `~/.codex/skills`.
 
 ## Features
