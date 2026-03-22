@@ -1,6 +1,6 @@
 # SkillShift
 
-[English](README.md)
+[English](README.en.md)
 
 一个用于 Codex 的技能，可将 Claude 的全部 skills 从 `~/.claude/skills` 迁移到 `~/.codex/skills`。
 

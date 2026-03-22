@@ -1,38 +1,38 @@
 # SkillShift
 
-[中文说明](README.zh-CN.md)
+[English](README.en.md)
 
-A Codex skill that migrates all Claude skills from `~/.claude/skills` to `~/.codex/skills`.
+一个用于 Codex 的技能，可将 Claude 的全部 skills 从 `~/.claude/skills` 迁移到 `~/.codex/skills`。
 
-## Features
+## 功能
 
-- Backup existing Codex skills before migration
-- Full sync with `rsync` (including scripts, assets, symlinks)
-- Rewrite hardcoded path references from Claude to Codex
-- Read-only verification mode
+- 迁移前自动备份现有 Codex skills
+- 使用 `rsync` 全量同步（包含脚本、资源、符号链接）
+- 自动改写文本中的路径引用（Claude -> Codex）
+- 提供只读校验模式
 
-## Files
+## 文件说明
 
-- `SKILL.md`: skill metadata and workflow guidance
-- `scripts/migrate.sh`: full migration script
-- `scripts/check.sh`: read-only validation script
+- `SKILL.md`：技能元数据与工作流说明
+- `scripts/migrate.sh`：执行完整迁移
+- `scripts/check.sh`：只读校验，不写入文件
 
-## Usage
+## 使用方法
 
 ```bash
-# Run migration
+# 执行迁移
 bash ~/.codex/skills/skillshift/scripts/migrate.sh
 
-# Validation only
+# 只做校验
 bash ~/.codex/skills/skillshift/scripts/check.sh
 ```
 
-## Safety
+## 安全说明
 
-- `migrate.sh` uses `rsync -a --delete`; destination mirrors source.
-- The script creates a timestamped backup of `~/.codex/skills` before sync.
+- `migrate.sh` 使用 `rsync -a --delete`，目标目录会镜像源目录。
+- 脚本会先创建 `~/.codex/skills` 的时间戳备份再执行同步。
 
-## Example Output
+## 输出示例
 
 ```text
 [1/4] Backup created: /Users/<you>/.codex/skills.backup.YYYYMMDD-HHMMSS
