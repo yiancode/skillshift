@@ -1,4 +1,4 @@
-# Claude Skills Migrator
+# SkillShift
 
 A Codex skill that migrates all Claude skills from `~/.claude/skills` to `~/.codex/skills`.
 
@@ -19,10 +19,10 @@ A Codex skill that migrates all Claude skills from `~/.claude/skills` to `~/.cod
 
 ```bash
 # Run migration
-bash ~/.codex/skills/claude-skills-migrator/scripts/migrate.sh
+bash ~/.codex/skills/skillshift/scripts/migrate.sh
 
 # Validation only
-bash ~/.codex/skills/claude-skills-migrator/scripts/check.sh
+bash ~/.codex/skills/skillshift/scripts/check.sh
 ```
 
 ## Safety

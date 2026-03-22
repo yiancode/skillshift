@@ -1,9 +1,9 @@
 ---
-name: claude-skills-migrator
+name: skillshift
 description: Migrate all Claude skills from ~/.claude/skills into ~/.codex/skills with backup, full sync, and path rewrite. Use when user asks to convert/sync/migrate Claude skills to Codex.
 ---
 
-# Claude Skills Migrator
+# SkillShift
 
 Use this skill when the user asks to migrate/convert/sync Claude skills into Codex skills.
 
@@ -19,13 +19,13 @@ Use this skill when the user asks to migrate/convert/sync Claude skills into Cod
 Execute:
 
 ```bash
-bash ~/.codex/skills/claude-skills-migrator/scripts/migrate.sh
+bash ~/.codex/skills/skillshift/scripts/migrate.sh
 ```
 
 Validation only (no writes):
 
 ```bash
-bash ~/.codex/skills/claude-skills-migrator/scripts/check.sh
+bash ~/.codex/skills/skillshift/scripts/check.sh
 ```
 
 ## Output You Must Report
