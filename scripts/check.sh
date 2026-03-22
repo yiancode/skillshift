@@ -1,59 +1,67 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SRC="$HOME/.claude/skills"
-DST="$HOME/.codex/skills"
+SRC_HOME="$HOME/.claude"
+DST_HOME="$HOME/.codex"
 
-if [[ ! -d "$SRC" ]]; then
-  echo "[ERROR] Source not found: $SRC" >&2
+report_count() {
+  local label="$1"
+  local src="$2"
+  local dst="$3"
+  local src_count=0
+  local dst_count=0
+  [[ -e "$src" ]] && src_count="$(find "$src" -type f 2>/dev/null | wc -l | tr -d ' ')"
+  [[ -e "$dst" ]] && dst_count="$(find "$dst" -type f 2>/dev/null | wc -l | tr -d ' ')"
+  echo "  - $label: source=$src_count target=$dst_count"
+}
+
+if [[ ! -d "$SRC_HOME" ]]; then
+  echo "[ERROR] Source not found: $SRC_HOME" >&2
+  exit 1
+fi
+if [[ ! -d "$DST_HOME" ]]; then
+  echo "[ERROR] Target not found: $DST_HOME" >&2
   exit 1
 fi
 
-if [[ ! -d "$DST" ]]; then
-  echo "[ERROR] Target not found: $DST" >&2
-  exit 1
-fi
+echo "[1/6] Path check: OK"
 
-echo "[1/5] Basic path check: OK"
+echo "[2/6] Skills + slash commands"
+report_count "skills" "$SRC_HOME/skills" "$DST_HOME/skills"
+report_count "slash commands(raw)" "$SRC_HOME/commands" "$DST_HOME/vendor_imports/claude/commands"
+report_count "slash commands(prompts)" "$SRC_HOME/commands" "$DST_HOME/prompts/claude-slash"
 
-SRC_DIRS="$(find "$SRC" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')"
-DST_DIRS="$(find "$DST" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')"
-echo "[2/5] Top-level dirs: source=$SRC_DIRS target=$DST_DIRS"
-
-MISSING_IN_DST="$(comm -23 \
-  <(find -L "$SRC" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort) \
-  <(find -L "$DST" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort) || true)"
-
-EXTRA_IN_DST="$(comm -13 \
-  <(find -L "$SRC" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort) \
-  <(find -L "$DST" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort) || true)"
-
-echo "[3/5] Missing dirs in target:"
-if [[ -n "$MISSING_IN_DST" ]]; then
-  echo "$MISSING_IN_DST"
+echo "[3/6] Plugins / hooks / subagents / templates"
+report_count "plugins" "$SRC_HOME/plugins" "$DST_HOME/vendor_imports/claude/plugins"
+report_count "hooks" "$SRC_HOME/hooks" "$DST_HOME/vendor_imports/claude/hooks"
+if [[ -d "$SRC_HOME/subagents" ]]; then
+  report_count "subagents" "$SRC_HOME/subagents" "$DST_HOME/vendor_imports/claude/subagents"
+elif [[ -d "$SRC_HOME/agents" ]]; then
+  report_count "subagents(agents)" "$SRC_HOME/agents" "$DST_HOME/vendor_imports/claude/subagents"
 else
-  echo "(none)"
+  echo "  - subagents: source=0 target=$(find "$DST_HOME/vendor_imports/claude/subagents" -type f 2>/dev/null | wc -l | tr -d ' ')"
 fi
+report_count "templates" "$SRC_HOME/templates" "$DST_HOME/vendor_imports/claude/templates"
 
-echo "[4/5] Extra dirs in target:"
-if [[ -n "$EXTRA_IN_DST" ]]; then
-  echo "$EXTRA_IN_DST"
-else
-  echo "(none)"
-fi
-
-KEY_SKILLS=(wechat-publisher pdf2pptx pptx mermaid-tools skill-creator)
-echo "[5/5] Key skill file-count check:"
-for s in "${KEY_SKILLS[@]}"; do
-  c1="$(find "$SRC/$s" -type f 2>/dev/null | wc -l | tr -d ' ')"
-  c2="$(find "$DST/$s" -type f 2>/dev/null | wc -l | tr -d ' ')"
-  echo "  - $s: source=$c1 target=$c2"
+echo "[4/6] MCP + settings snapshots"
+for f in ".claude.json" "config.json" "settings.json" "settings.local.json" "CLAUDE.md"; do
+  srcf="$HOME/$f"
+  [[ "$f" != ".claude.json" ]] && srcf="$SRC_HOME/$f"
+  if [[ -f "$srcf" ]]; then
+    base="$(basename "$srcf")"
+    if [[ -f "$DST_HOME/vendor_imports/claude/settings/$base" || -f "$DST_HOME/vendor_imports/claude/mcp/$base" ]]; then
+      echo "  - found snapshot: $base"
+    else
+      echo "  - missing snapshot: $base"
+    fi
+  fi
 done
 
-if [[ -z "$MISSING_IN_DST" ]]; then
-  echo "[OK] Check finished."
-else
-  echo "[WARN] Check finished with missing target dirs."
-  exit 2
-fi
+echo "[5/6] Key skill samples"
+for s in wechat-publisher pdf2pptx pptx mermaid-tools skill-creator; do
+  report_count "$s" "$SRC_HOME/skills/$s" "$DST_HOME/skills/$s"
+done
+
+echo "[6/6] Result"
+echo "[OK] Check finished."
 

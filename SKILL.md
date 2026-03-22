@@ -1,6 +1,6 @@
 ---
 name: skillshift
-description: Migrate all Claude skills from ~/.claude/skills into ~/.codex/skills with backup, full sync, and path rewrite. Use when user asks to convert/sync/migrate Claude skills to Codex.
+description: Migrate Claude assets to Codex, including skills, slash commands, plugins, MCP snapshots, subagents, hooks, templates, and settings. Use when user asks to convert/sync/migrate Claude setup to Codex.
 ---
 
 # SkillShift
@@ -9,17 +9,30 @@ Use this skill when the user asks to migrate/convert/sync Claude skills into Cod
 
 ## What This Skill Does
 
-1. Backs up current Codex skills directory.
-2. Fully syncs `~/.claude/skills` to `~/.codex/skills`.
-3. Rewrites hardcoded Claude skill paths in text files to Codex paths.
-4. Verifies source/target skill directory counts.
+1. Backs up current Codex migration targets.
+2. Fully syncs Claude skills to Codex skills.
+3. Migrates Claude slash commands and converts them into Codex prompt files.
+4. Migrates common Claude assets:
+   - plugins
+   - hooks
+   - subagents/agents
+   - templates
+   - MCP/settings snapshots
+5. Rewrites common hardcoded Claude paths to Codex paths.
+6. Provides read-only validation.
 
 ## Run
 
-Execute:
+macOS/Linux:
 
 ```bash
 bash ~/.codex/skills/skillshift/scripts/migrate.sh
+```
+
+Windows (PowerShell):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "$HOME\.codex\skills\skillshift\scripts\migrate.ps1"
 ```
 
 Validation only (no writes):
@@ -33,9 +46,10 @@ bash ~/.codex/skills/skillshift/scripts/check.sh
 After running, report:
 
 1. Backup path.
-2. Sync completion status.
-3. Path rewrite completion status.
-4. Verify line: `source dirs=<n>, target dirs=<n>`.
+2. Skills/slash commands migration status.
+3. plugins/mcp/subagents/hooks/templates migration status.
+4. Path rewrite completion status.
+5. Verify lines for key modules.
 5. Whether migration is successful.
 
 ## Notes
