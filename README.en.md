@@ -1,50 +1,74 @@
 # SkillShift
 
-[中文](README.md)
+[中文](README.md) | [中文（备用）](README.zh-CN.md)
 
-A Codex skill that migrates Claude setup to Codex, including skills, slash commands, plugins, MCP snapshots, subagents, hooks, templates, and settings.
+A practical migration toolkit for moving local Claude assets into Codex. It migrates not only `skills`, but also slash commands, plugins, MCP snapshots, subagents, hooks, templates, and settings snapshots.
 
-## Features
+## When To Use
 
-- Backup existing Codex skills before migration
-- Full sync with `rsync` (including scripts, assets, symlinks)
-- Rewrite hardcoded path references from Claude to Codex
-- Read-only verification mode
-- Migration support for common Claude assets:
-  - slash commands (converted to Codex prompts)
-  - plugins
-  - MCP config snapshots
-  - subagents/agents
-  - hooks
-  - templates / settings
+- You want to move your local setup from `~/.claude` to `~/.codex`.
+- You do not want to manually rebuild commands/plugins/MCP config.
+- You want a migration flow with verification and rollback options.
 
-## Files
+## Migration Matrix
 
-- `SKILL.md`: skill metadata and workflow guidance
-- `scripts/migrate.sh`: full migration script for macOS/Linux
-- `scripts/migrate.ps1`: full migration script for Windows PowerShell
-- `scripts/check.sh`: read-only validation script
+| Asset Type | Claude Source | Codex Target | Notes |
+|---|---|---|---|
+| Skills | `~/.claude/skills` | `~/.codex/skills` | `migrate.sh` excludes `skillshift` and `.system` |
+| Slash Commands (raw) | `~/.claude/commands` | `~/.codex/vendor_imports/claude/commands` | Kept as archived source |
+| Slash Commands (converted) | `~/.claude/commands/*.md` | `~/.codex/prompts/claude-slash/` | Converted into Codex prompt files |
+| Plugins | `~/.claude/plugins` | `~/.codex/vendor_imports/claude/plugins` | Mirrored directory sync |
+| Hooks | `~/.claude/hooks` | `~/.codex/vendor_imports/claude/hooks` | Mirrored directory sync |
+| Subagents / Agents | `~/.claude/subagents` or `~/.claude/agents` | `~/.codex/vendor_imports/claude/subagents` | First available source is used |
+| Templates | `~/.claude/templates` | `~/.codex/vendor_imports/claude/templates` | Mirrored directory sync |
+| Settings snapshots | `.claude.json` and related files | `~/.codex/vendor_imports/claude/settings` | Snapshot copy |
+| MCP snapshots | `.claude.json` / related config | `~/.codex/vendor_imports/claude/mcp` | Uses `jq` summary when available |
 
-## Usage
+## Prerequisites
+
+- macOS/Linux: `bash` and `rsync`
+- Windows: PowerShell (prefers `robocopy`, falls back to `Copy-Item`)
+- Optional: `jq` for MCP server summary extraction
+
+## Quick Start
 
 ```bash
-# Run migration
+# Full migration (macOS/Linux)
 bash ~/.codex/skills/skillshift/scripts/migrate.sh
 
-# Validation only
+# Read-only validation
 bash ~/.codex/skills/skillshift/scripts/check.sh
 ```
 
 ```powershell
-# Windows PowerShell migration
+# Full migration (Windows PowerShell)
 powershell -ExecutionPolicy Bypass -File "$HOME\.codex\skills\skillshift\scripts\migrate.ps1"
 ```
 
-## Safety
+## What To Verify After Migration
+
+- Backup path is printed.
+- Skills and slash-command prompt counts look expected.
+- Plugins/hooks/subagents/templates are present under `vendor_imports/claude`.
+- `check.sh` ends with `[OK] Check finished.`
+
+## Safety And Rollback
 
 - `migrate.sh` uses `rsync -a --delete`; destination mirrors source.
-- The script creates a timestamped backup of `~/.codex/skills` before sync.
-- Non-skill Claude assets are migrated to `~/.codex/vendor_imports/claude/`.
+- On macOS/Linux, migration targets are backed up before sync.
+- Restore from `~/.codex/claude-migration-backup.*` if rollback is needed.
+
+## Platform Notes
+
+- `migrate.sh` (macOS/Linux) is a 7-step flow with backup and verify counters.
+- `migrate.ps1` (Windows) is equivalent in intent, but not line-by-line identical.
+
+## Repository Layout
+
+- `SKILL.md`: skill metadata and workflow contract
+- `scripts/migrate.sh`: full migration for macOS/Linux
+- `scripts/migrate.ps1`: full migration for Windows PowerShell
+- `scripts/check.sh`: read-only validation script
 
 ## Example Output
 
